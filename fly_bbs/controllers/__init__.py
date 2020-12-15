@@ -1,4 +1,8 @@
-def config_route(app):
-    @app.route('/')
-    def home():
-        return '<h1>Hello World!</h1>'
+from .user_view import user_view
+
+bp_list = [user_view]
+
+
+def config_blueprints(app):
+    for bp in bp_list:
+        app.register_blueprint(bp)
