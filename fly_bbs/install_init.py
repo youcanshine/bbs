@@ -17,7 +17,7 @@ def init():
         'renzheng': '社区超级管理员',
         'vip': 5,
         'coin': 99999,
-        'avatar': '/static/images/1.png',
+        'avatar': '/static/images/avatar/1.jpg',
         'is_active': True,
         'create_at': datetime.utcnow(),
     })

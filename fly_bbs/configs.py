@@ -6,6 +6,7 @@ class DevConfig:
 
     MONGO_URI = 'mongodb://localhost:27017/pyfly'
     SECRET_KEY = os.environ.get('SECRET_KEY', 'odawara')
+    WTF_CSRF_ENABLED = False
 
 
 class ProConfig(DevConfig):
