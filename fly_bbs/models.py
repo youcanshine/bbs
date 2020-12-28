@@ -1,4 +1,5 @@
 from werkzeug.security import check_password_hash
+from json import JSONEncoder
 
 
 class R(dict):
@@ -51,5 +52,22 @@ class User:
     @staticmethod
     def validate_login(password_hash, password):
         return check_password_hash(password_hash, password)
+
+
+class Page:
+    def __init__(self, pn, size, sort_by=None, filter1=None, result=None, has_more=False,
+                 page_count=0, total=0):
+        self.pn = pn
+        self.size = size
+        self.sort_by = sort_by
+        self.filter1 = filter1
+        self.result = result
+        self.has_more = has_more
+        self.page_count = page_count
+        self.total = total
+
+    def __repr__(self):
+        return JSONEncoder().encode(self.__dict__)
+
 
 

@@ -1,5 +1,6 @@
 from .extensions import mongo
 from bson.objectid import ObjectId
+from .models import Page
 
 
 def get_option(name, default=None):
@@ -23,5 +24,31 @@ def get_list(collection_name, sort_by=None, filter1=None, size=None):
         result = result.limit(size)
     result = list(result)
     return result
+
+
+def get_page(collection_name, pn=1, size=10, sort_by=None, filter1=None):
+    _process_filter(filter1)
+    size = size if size > 0 else 10
+    total = mongo.db[collection_name].count(filter1)
+    skip_count = size * (pn - 1)
+    result = []
+    has_more = total > pn * size
+    if total > skip_count:
+        result = mongo.db[collection_name].find(filter1, limit=size)
+        if sort_by:
+            result = result.sort(sort_by[0], sort_by[1])
+        if skip_count > 0:
+            result.skip(skip_count)
+    page_count = total // size
+    if total % size > 0:
+        page_count += 1
+    page = Page(pn, size, sort_by, filter1, list(result), has_more, page_count, total)
+    return page
+
+
+def find_one(collection_name, filter1=None):
+    _process_filter(filter1)
+    return mongo.db[collection_name].find_one(filter1)
+
 
 

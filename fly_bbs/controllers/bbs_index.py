@@ -1,22 +1,43 @@
-from flask import Blueprint, render_template, session, jsonify, url_for
+from flask import Blueprint, render_template, session, jsonify, url_for, request
 from flask_login import current_user
 from bson import ObjectId
 from datetime import datetime
-
+from pymongo import DESCENDING
 from .. import code_msg
 from ..forms import PostForm
 from ..models import R, BaseResult
 from ..utils import gen_verify_num, verify_num
 from ..extensions import mongo
+from ..db_utils import get_page
 
 
 bbs_index = Blueprint("bbs_index", __name__, template_folder='templates')
 
 
 @bbs_index.route('/')
-def index():
-    username = session.get('username')
-    return render_template('base.html', username=username)
+@bbs_index.route('/page/<int:pn>/size/<int:size>')
+@bbs_index.route('/page/<int:pn>')
+@bbs_index.route("/catalog/<ObjectId:catalog_id>")
+@bbs_index.route("/catalog/<ObjectId:catalog_id>/page/<int:pn>")
+@bbs_index.route("/catalog/<ObjectId:catalog_id>/page/<int:pn>/size/<int:size>")
+def index(pn=1, size=10, catalog_id=None):
+    sort_key = request.values.get('sort_key', '_id')
+    sort_by = (sort_key, DESCENDING)
+    post_type = request.values.get('type')
+    filter1 = {}
+    if post_type == 'not_closed':
+        filter1['is_closed'] = {'$ne': True}
+    if post_type == 'is_closed':
+        filter1['is_closed'] = True
+    if post_type == 'is_cream':
+        filter1['is_cream'] = True
+    if catalog_id:
+        filter1['catalog_id'] = catalog_id
+    page = get_page('posts', pn=pn, filter1=filter1, size=size,
+                    sort_by=sort_by)
+    return render_template('post_list.html', is_index=catalog_id is None, page=page,
+                           sort_key=sort_key, catalog_id=catalog_id,
+                           post_type=post_type)
 
 
 @bbs_index.route('/add', methods=['GET', 'POST'])
