@@ -64,7 +64,7 @@ class Page:
         self.result = result
         self.has_more = has_more
         self.page_count = page_count
-        self.total = total
+        self.total_page = total
 
     def __repr__(self):
         return JSONEncoder().encode(self.__dict__)
