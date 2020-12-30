@@ -47,7 +47,7 @@
         {% endfor %}
       </ul>
       {% if page.total_page > 1 %}
-        {% include '_pagination.html' %}
+
         {{ pagination.paginate(page, url_prefix, url_suffix) }}
       {% endif %}
     </div>

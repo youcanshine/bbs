@@ -1,5 +1,7 @@
 from werkzeug.security import check_password_hash
-from json import JSONEncoder
+import json
+from datetime import datetime
+from bson import ObjectId
 
 
 class R(dict):
@@ -54,6 +56,15 @@ class User:
         return check_password_hash(password_hash, password)
 
 
+class MyEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        if isinstance(o, datetime):
+            return o.isoformat()
+        super().default(o)
+
+
 class Page:
     def __init__(self, pn, size, sort_by=None, filter1=None, result=None, has_more=False,
                  page_count=0, total=0):
@@ -64,10 +75,11 @@ class Page:
         self.result = result
         self.has_more = has_more
         self.page_count = page_count
-        self.total_page = total
+        self.total = total
+        self.total_page = self.page_count
 
     def __repr__(self):
-        return JSONEncoder().encode(self.__dict__)
+        return MyEncoder().encode(self.__dict__)
 
 
 
