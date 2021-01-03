@@ -99,7 +99,7 @@
                   {% endif %}
                 </a>
 
-                {% if post.user_id == item_user_id %}
+                {% if post.user_id == item_user._id %}
                   <span>(楼主)</span>
                 {% endif %}
                 {% if item_user.is_admin %}
