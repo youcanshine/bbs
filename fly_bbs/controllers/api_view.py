@@ -170,6 +170,28 @@ def reply_zan(comment_id):
     return jsonify(models.R().ok())
 
 
+@api_view.route('/reply/update/<ObjectId:comment_id>', methods=['POST'])
+@login_required
+def reply_update(comment_id):
+    content = request.values.get('content')
+    if not content:
+        return jsonify(code_msg.POST_CONTENT_EMPTY)
+    comment = mongo.db.comments.find_one_or_404({'_id': comment_id})
+    if current_user.user['_id'] != comment['user_id']:
+        abort(403)
+    mongo.db.comments.update_one(
+        {'_id': comment_id}, {'$set': {'content': content}}
+    )
+    return jsonify(models.R.ok())
+
+
+@api_view.route('/reply/content/<ObjectId:comment_id>', methods=['POST', 'GET'])
+@login_required
+def get_reply_content(comment_id):
+    print('get_reply_content: %s' % comment_id)
+    comment = mongo.db.comments.find_one_or_404({'_id': ObjectId(comment_id)})
+    return jsonify(models.R.ok(data=comment['content']))
+
 
 
 
