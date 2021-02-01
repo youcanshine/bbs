@@ -89,6 +89,7 @@ def post_reply():
     mongo.db.posts.update(
         {'_id': post_id}, {'$inc': {'comment_count': 1}}
     )
+
     if post['user_id'] != current_user.user['_id']:
         user = mongo.db.users.find_one({'_id': post['user_id']})
         add_message(user, render_template(

@@ -8,7 +8,7 @@ from .. import utils
 from werkzeug.security import generate_password_hash
 from random import randint
 from ..forms import RegisterForm, LoginForm
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required
 
 
 user_view = Blueprint('user', __name__, url_prefix='/user', template_folder='templates')
@@ -93,3 +93,11 @@ def register():
         ver_code=ver_code['question'],
         form=form
     )
+
+
+@user_view.route('/<ObjectId:user_id>')
+@login_required
+def user_home(user_id):
+    user = mongo.db.users.find_one_or_404({'_id': user_id})
+    return render_template('user/home.html', user=user)
+

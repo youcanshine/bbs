@@ -5,37 +5,52 @@
 
 <div style="text-align: center">
   <div class="laypage-main">
-    {# 当前帖子页数大于 1 时，设置上页帖子的 url #} {% if page.pn > 1 and
-    page.pn <= page.total_page %}
-    <a
-      href="{{ url_prefix }}page/{{ page.pn - 1 }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}"
-      class="laypage-prev"
-      >上一页</a
-    >
-    {% endif %} {# 当页数大于 4 时显示省略号 #} {% if page.pn > 4 %}
+    {# 当前帖子页数大于 1 时，设置上页帖子的 url #}
+    {% if page.pn > 1 and page.pn <= page.total_page %}
+        <a
+            href="{{ url_prefix }}page/{{ page.pn - 1 }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}"
+            class="laypage-prev"
+        >上一页
+        </a>
+    {% endif %} {# 当页数大于 4 时显示省略号 #}
+    {% if page.pn > 4 %}
+        <span>…</span>
+    {% endif %} {# 定义开始页码和结束页码 #}
+    {% set page_start = page.pn - 2 %}
+    {% set page_end = page.pn + 2 %} {# 没有省略号时的页码 #}
+    {% if page_start < 1 %}
+        {% set page_start = 1 %}
+        {% set page_end = 5 %}
+    {% endif %}
+    {# 当结束页码数超过实际页码数后 #}
+    {% if page_end > page.total_page %}
+        {% set page_end = page.total_page %}
+        {% if page_end - 5 > 1 %}
+            {% set page_start = page_end - 5 %}
+        {% endif %}
+    {% endif %} {# 显示页码 #}
+    {% for i in range(page_start, page_end + 1) %}
+        {% if i == page.pn or page.pn > page.total_page %}
+            <span class="laypage-curr">{{ i }}</span>
+        {% else %}
+            <a
+                href="{{ url_prefix }}page/{{ i }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}"
+            >
+                {{ i }}
+            </a>
+        {% endif %}
+    {% endfor %}
+    {% if page.total_page - page.pn > 3 %}
     <span>…</span>
-    {% endif %} {# 定义开始页码和结束页码 #} {% set page_start = page.pn - 2 %}
-    {% set page_end = page.pn + 2 %} {# 没有省略号时的页码 #} {% if page_start <
-    1 %} {% set page_start = 1 %} {% set page_end = 5 %} {% endif %} {#
-    当结束页码数超过实际页码数后 #} {% if page_end > page.total_page %} {% set
-    page_end = page.total_page %} {% if page_end - 5 > 1 %} {% set page_start =
-    page_end - 5 %} {% endif %} {% endif %} {# 显示页码 #} {% for i in
-    range(page_start, page_end + 1) %} {% if i == page.pn or page.pn >
-    page.total_page %}
-    <span class="laypage-curr">{{ i }}</span>
-    {% else %}
-    <a
-      href="{{ url_prefix }}page/{{ i }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}"
-      >{{ i }}</a
-    >
-    {% endif %} {% endfor %} {% if page.total_page - page.pn > 3 %}
-    <span>…</span>
-    {% endif %} {# 下一页的 url #} {% if page.pn < page.total_page %}
-    <a
-      href="{{ url_prefix }}page/{{ page.pn + 1 }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}"
-      class="laypage-next"
-      >下一页</a
-    >
+    {% endif %}
+    {# 下一页的 url #}
+    {% if page.pn < page.total_page %}
+        <a
+          href="{{ url_prefix }}page/{{ page.pn + 1 }}{{ ('/size/' + page.size|string) if page.size != 10 }}{{ url_suffix }}"
+          class="laypage-next"
+        >
+          下一页
+        </a>
     {% endif %}
   </div>
 </div>

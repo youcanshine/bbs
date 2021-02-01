@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, jsonify, url_for, request
+from flask import Blueprint, render_template, session, jsonify, url_for, request, redirect
 from flask_login import current_user
 from bson import ObjectId
 from datetime import datetime
@@ -104,3 +104,21 @@ def post_detail(post_id, pn=1):
     return render_template('jie/detail.html', post=post, title=['title'],
                            page_name='jie', comment_page=page, catalog_id=post['catalog_id'])
 
+
+@bbs_index.route('/comment/<ObjectId:comment_id>/')
+def jump_comment(comment_id):
+    comment = mongo.db.comments.find_one_or_404({'_id': comment_id})
+    post_id = comment['post_id']
+    pn = 1
+    if not comment.get('is_adopted', False):
+        comment_index = mongo.db.comments.count(
+            {
+                'post_id': post_id, '_id': {'$lt': comment_id}
+            }
+        )
+        pn = comment_index // 10
+        if pn == 0 or comment_index % 10 != 0:
+            pn += 1
+    return redirect(
+        url_for('bbs_index.post_detail', post_id=post_id, pn=pn) + '#item-' + str(comment_id)
+    )

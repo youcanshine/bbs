@@ -43,6 +43,7 @@
             {% endif %}
           {% endif %}
         </div>
+        <p id="random-variable">{{ random_variable|string }}</p>
         <span class="fly-list-nums">
             <a href="#comment"><i class="iconfont" title="回答">&#xe60c;</i> {{ post.get('comment_count', 0) }}</a>
             <i class="iconfont" title="人气">&#xe60b;</i> {{ post.get('view_count', 0) }}
