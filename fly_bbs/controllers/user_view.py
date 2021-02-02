@@ -8,7 +8,11 @@ from .. import utils
 from werkzeug.security import generate_password_hash
 from random import randint
 from ..forms import RegisterForm, LoginForm
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
+from .. import db_utils
+from .. import models
+from .. import forms
+from .. import code_msg
 
 
 user_view = Blueprint('user', __name__, url_prefix='/user', template_folder='templates')
@@ -100,4 +104,73 @@ def register():
 def user_home(user_id):
     user = mongo.db.users.find_one_or_404({'_id': user_id})
     return render_template('user/home.html', user=user)
+
+
+@user_view.route('/messsage')
+@user_view.route('/message/page/<int:pn>')
+@login_required
+def user_message(pn=1):
+    user = current_user.user
+    if user.get('unread', 0) > 0:
+        mongo.db.users.update({'_id': user['_id']}, {'$set': {'unread': 0}})
+    message_page = db_utils.get_page(
+        'messages', pn, filter1={'user_id': user['_id']}, sort_by=('_id', -1)
+    )
+    return render_template(
+        'user/message.html', user_page='message', page_name='user', page=message_page
+    )
+
+
+@user_view.route('/message/remove', methods=['POST'])
+@login_required
+def remove_message():
+    user = current_user.user
+    if request.values.get('all') == 'true':
+        mongo.db.messages.delete_many({'user_id': user['_id']})
+    elif request.values.get('id'):
+        msg_id = ObjectId(request.values.get('id'))
+        mongo.db.messages.delete_one({'_id': msg_id})
+    return jsonify(models.BaseResult())
+
+
+@user_view.route('/set', methods=['GET', 'POST'])
+@login_required
+def user_set():
+    if request.method == 'POST':
+        include_keys = ['username', 'avatar', 'desc', 'city', 'sex']
+        data = request.values
+        update_data = {}
+        for key in data.keys():
+            if key in include_keys:
+                update_data[key] = data.get(key)
+        mongo.db.users.update(
+            {'_id': current_user.user['_id']}, {'$set': update_data}
+        )
+        return jsonify('修改成功')
+    return render_template(
+        'user/set.html', user_page='set', page_name='user', title='基本设置'
+    )
+
+
+@user_view.route('/repass', methods=['POST'])
+def user_repass():
+    if not current_user.is_authenticated:
+        redirect(url_for('user.login'))
+    pwd_form = forms.ChangePassWordForm()
+    if not pwd_form.validate():
+        return jsonify(
+            models.R.fail(
+                code_msg.PARAM_ERROR.get_msg(),
+                str(pwd_form.errors)
+            )
+        )
+    nowpassword = pwd_form.nowpassword.data
+    password = pwd_form.password.data
+    user = current_user.user
+    if not models.User.validate_login(user['password'], nowpassword):
+        raise Exception(code_msg.PASSWORD_ERROR)
+    mongo.db.users.update(
+        {'_id': user['_id']}, {'$set': {'password': generate_password_hash(password)}}
+    )
+    return jsonify(models.R.ok())
 
