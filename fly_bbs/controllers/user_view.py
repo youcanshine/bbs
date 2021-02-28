@@ -1,7 +1,7 @@
 import json
 from bson import ObjectId
 from datetime import datetime
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session
+from flask import Blueprint, abort, render_template, request, jsonify, redirect, url_for, session
 from ..models import User
 from ..extensions import mongo
 from .. import utils
@@ -25,6 +25,22 @@ class MyEncoder(json.JSONEncoder):
         if isinstance(o, datetime):
             return o.isoformat()
         super().default(o)
+
+
+def send_active_email(username, user_id, email, is_forget=False):
+    code = mongo.db.active_codes.insert_one({'user_id': user_id})
+    if is_forget:
+        body = render_template(
+            'email/user_repwd.html',
+            url=url_for('user.user_pass_forget', code=code.inserted_id, _external=True)
+        )
+        utils.send_email(email, '重置密码', body=body)
+        return
+    body = render_template(
+        'email/user_active.html', username=username,
+        url=url_for('user.user_active', code=code.inserted_id, _external=True)
+    )
+    utils.send_email(email, '账号激活', body=body)
 
 
 @user_view.route('/')
@@ -78,7 +94,7 @@ def register():
         if user:
             return jsonify({'status': 50000, 'msg': '该邮箱已经注册'})
         user = {
-            'is_active': True,
+            'is_active': False,
             'coin': 0,
             'email': form.email.data,
             'username': form.username.data,
@@ -89,7 +105,13 @@ def register():
             'password': generate_password_hash(form.password.data),
             'created_at': datetime.utcnow()
         }
-        mongo.db.users.insert_one(user)
+        insert_result = mongo.db.users.insert_one(user)
+        # utils.send_email(form.email.data, '你激活了',
+        #                  body='你已经成功注册了账号，同时完成了发送邮件功能！')
+        # mongo.db.users.update_one(
+        #     {'username': form.username.data}, {'$set': {'is_active': True}}
+        # )
+        send_active_email(form.username.data, insert_result.inserted_id, form.email.data)
         return redirect(url_for('.login'))
     ver_code = utils.gen_verify_num()
     return render_template(
@@ -152,25 +174,121 @@ def user_set():
     )
 
 
+# @user_view.route('/repass', methods=['POST'])
+# def user_repass():
+#     if not current_user.is_authenticated:
+#         redirect(url_for('user.login'))
+#     pwd_form = forms.ChangePassWordForm()
+#     if not pwd_form.validate():
+#         return jsonify(
+#             models.R.fail(
+#                 code_msg.PARAM_ERROR.get_msg(),
+#                 str(pwd_form.errors)
+#             )
+#         )
+#     nowpassword = pwd_form.nowpassword.data
+#     password = pwd_form.password.data
+#     user = current_user.user
+#     if not models.User.validate_login(user['password'], nowpassword):
+#         raise Exception(code_msg.PASSWORD_ERROR)
+#     mongo.db.users.update(
+#         {'_id': user['_id']}, {'$set': {'password': generate_password_hash(password)}}
+#     )
+#     return jsonify(models.R.ok())
+
+
+@user_view.route('/active', methods=['GET', 'POST'])
+def user_active():
+    if request.method == 'GET':
+        code = request.values.get('code')
+        if code:
+            user_id = mongo.db.active_codes.find_one(
+                {'_id': ObjectId(code)}
+            ).get('user_id')
+            if user_id:
+                mongo.db.active_codes.delete_many({'user_id': ObjectId(user_id)})
+                mongo.db.users.update(
+                    {'_id': user_id}, {'$set': {'is_active': True}}
+                )
+                user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
+                login_user(models.User(user))
+                return render_template('user/activate.html')
+        if not current_user.is_authenticated:
+            abort(403)
+        return render_template('user/activate.html')
+    user = current_user.user
+    mongo.db.active_codes.delete_many({'user_id': ObjectId(user['_id'])})
+    send_active_email(user['username'], user['_id'], user['email'])
+    return jsonify(code_msg.RE_ACTIVATE_MAIL_SEND.put('action', url_for('user.user_active')))
+
+
+@user_view.route('/forget', methods=['POST', 'GET'])
+def user_pass_forget():
+    code = request.args.get('code')
+    mail_form = forms.SendForgetMailForm()
+    if mail_form.is_submitted():
+        if not mail_form.validate():
+            return jsonify(
+                models.R.fail(
+                    code_msg.PARAM_ERROR.get_msg(),
+                    str(mail_form.errors)
+                )
+            )
+        email = mail_form.email.data
+        ver_code = mail_form.vercode.data
+        utils.verify_num(ver_code)
+        user = mongo.db.users.find_one({'email': email})
+        if not user:
+            return jsonify(code_msg.USER_NOT_EXIST)
+        send_active_email(user['username'], user_id=user['_id'], email=email, is_forget=True)
+        return jsonify(code_msg.RE_PWD_MAIL_SEND.put('action', url_for('user.login')))
+    has_code = False
+    user = None
+    if code:
+        active_code = mongo.db.active_codes.find_one({'_id': ObjectId(code)})
+        if not active_code:
+            return render_template(
+                'user/forget.html', page_name='user', has_code=True, code_invalid=True
+            )
+        has_code = True
+        user = mongo.db.users.find_one({'_id': active_code['user_id']})
+    ver_code = utils.gen_verify_num()
+
+    return render_template(
+        'user/forget.html', page_name='user', ver_code=ver_code['question'],
+        code=code, has_code=has_code, user=user
+    )
+
+
 @user_view.route('/repass', methods=['POST'])
 def user_repass():
+    if 'email' in request.values:
+        pwd_form = forms.ForgetPasswordForm()
+        if not pwd_form.validate():
+            return jsonify(models.R.fail(code_msg.PARAM_ERROR.get_msg(), str(pwd_form.errors)))
+        email = pwd_form.email.data
+        ver_code = pwd_form.vercode.data
+        code = pwd_form.code.data
+        password = pwd_form.password.data
+        utils.verify_num(ver_code)
+        active_code = mongo.db.active_codes.find_one_or_404({'_id': ObjectId(code)})
+        mongo.db.active_codes.delete_one({'_id': ObjectId(code)})
+        user = mongo.db.users.update(
+            {'_id': active_code['user_id'], 'email': email},
+            {'$set': {'password': generate_password_hash(password)}}
+        )
+        if user['nModified'] == 0:
+            return jsonify(code_msg.CHANGE_PWD_FAIL.put('action', url_for('user.login')))
+        return jsonify(code_msg.CHANGE_PWD_SUCCESS.put('action', url_for('user.login')))
     if not current_user.is_authenticated:
-        redirect(url_for('user.login'))
+        return redirect(url_for('user.login'))
     pwd_form = forms.ChangePassWordForm()
     if not pwd_form.validate():
-        return jsonify(
-            models.R.fail(
-                code_msg.PARAM_ERROR.get_msg(),
-                str(pwd_form.errors)
-            )
-        )
+        return jsonify(models.R.fail(code_msg.PARAM_ERROR.get_msg(), str(pwd_form.errors)))
     nowpassword = pwd_form.nowpassword.data
     password = pwd_form.password.data
     user = current_user.user
     if not models.User.validate_login(user['password'], nowpassword):
-        raise Exception(code_msg.PASSWORD_ERROR)
-    mongo.db.users.update(
-        {'_id': user['_id']}, {'$set': {'password': generate_password_hash(password)}}
-    )
+        raise Exception(">>> Password error")
+    mongo.db.users.update({'_id': user['_id']}, {'$set': {'password': generate_password_hash(password)}})
     return jsonify(models.R.ok())
-

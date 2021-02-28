@@ -1,14 +1,10 @@
-{% extends 'base.html' %}
-{% block title %}
-    Register
-{% endblock %}
-{% block body %}
+{% extends 'base.html' %} {% block body %}
 <div class="layui-container fly-marginTop">
   <div class="fly-panel fly-panel-user" pad20>
     <div class="layui-tab layui-tab-brief" lay-filter="user">
       <ul class="layui-tab-title">
         <li><a href="{{ url_for('user.login') }}">登入</a></li>
-        <li class="layui-this">注册</li>
+        <li class="layui-this">找回密码<!--重置密码--></li>
       </ul>
       <div
         class="layui-form layui-tab-content"
@@ -16,40 +12,13 @@
         style="padding: 20px 0;"
       >
         <div class="layui-tab-item layui-show">
-          <div class="layui-form layui-form-pane">
-            <form method="post" action="/user/register">
-              {# {{ form.csrf_token }} #}
-              <div class="layui-form-item">
-                <label for="L_email" class="layui-form-label">邮箱</label>
-                <div class="layui-input-inline">
-                  <input
-                    type="text"
-                    id="L_email"
-                    name="email"
-                    required
-                    lay-verify="email"
-                    autocomplete="off"
-                    class="layui-input"
-                  />
-                </div>
-                <div class="layui-form-mid layui-word-aux">
-                  将会成为您唯一的登入名
-                </div>
-              </div>
-              <div class="layui-form-item">
-                <label for="L_username" class="layui-form-label">昵称</label>
-                <div class="layui-input-inline">
-                  <input
-                    type="text"
-                    id="L_username"
-                    name="username"
-                    required
-                    lay-verify="required"
-                    autocomplete="off"
-                    class="layui-input"
-                  />
-                </div>
-              </div>
+          {# has_code 为真时，说明用户是从邮箱里点击重置密码访问的 #} {% if
+          has_code %} {% if code_invalid %}
+          <div class="fly-error">该重置密码链接已失效，请重新校验您的信息</div>
+          {% else %}
+          <div class="fly-msg">{{ user.username }}，请重置您的密码</div>
+          <div class="layui-form layui-form-pane" style="margin-top: 30px;">
+            <form action="{{ url_for('user.user_repass') }}" method="post">
               <div class="layui-form-item">
                 <label for="L_pass" class="layui-form-label">密码</label>
                 <div class="layui-input-inline">
@@ -71,7 +40,7 @@
                   <input
                     type="password"
                     id="L_repass"
-                    name="repeat_password"
+                    name="repassword"
                     required
                     lay-verify="required"
                     autocomplete="off"
@@ -83,7 +52,7 @@
                 <label for="L_vercode" class="layui-form-label">人类验证</label>
                 <div class="layui-input-inline">
                   <input
-                    type="number"
+                    type="text"
                     id="L_vercode"
                     name="vercode"
                     required
@@ -94,27 +63,64 @@
                   />
                 </div>
                 <div class="layui-form-mid">
-                  <span style="color: #c00;">{{ver_code}}</span>
+                  <span style="color: #c00;">{{ ver_code }}</span>
                 </div>
               </div>
               <div class="layui-form-item">
-                <button
-                  class="layui-btn"
-                  lay-filter="*"
-                  alert="true"
-                  lay-submit
-                >
-                  立即注册
+                <input type="hidden" name="code" value="{{ code }}" />
+                <input type="hidden" name="email" value="{{ user.email }}" />
+                <button class="layui-btn" alert="1" lay-filter="*" lay-submit>
+                  提交
                 </button>
               </div>
             </form>
           </div>
+          {% endif %} {# 输入忘记密码账号的邮箱页面 #} {% else %}
+          <div class="layui-form layui-form-pane">
+            <form method="post">
+              <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                  <input
+                    type="text"
+                    id="L_email"
+                    name="email"
+                    required
+                    lay-verify="required|email"
+                    autocomplete="off"
+                    class="layui-input"
+                  />
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <label for="L_vercode" class="layui-form-label">人类验证</label>
+                <div class="layui-input-inline">
+                  <input
+                    type="text"
+                    id="L_vercode"
+                    name="vercode"
+                    required
+                    lay-verify="required"
+                    placeholder="请回答后面的问题"
+                    autocomplete="off"
+                    class="layui-input"
+                  />
+                </div>
+                <div class="layui-form-mid">
+                  <span style="color: #c00;">{{ ver_code }}</span>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <button class="layui-btn" alert="1" lay-filter="*" lay-submit>
+                  提交
+                </button>
+              </div>
+            </form>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-{% block other_js %}
-<script></script>
 {% endblock %}

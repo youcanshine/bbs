@@ -4,14 +4,14 @@ from wtforms.validators import (
     DataRequired, Email, EqualTo, Length, InputRequired
 )
 from . import code_msg
+from wtforms import fields
 
 
 class RegisterForm(FlaskForm):
     email = StringField(validators=[DataRequired('不能为空'), Email('请输入正确的邮箱格式')])
     username = StringField(validators=[DataRequired('不能为空')])
     password = PasswordField(validators=[DataRequired('不能为空'), Length(3, 26, '密码长度尾3 ~ 26个字符')])
-    repeat_password = PasswordField(validators=[
-        EqualTo('password', '两次输入的密码不一致')])
+    repeat_password = PasswordField(validators=[EqualTo('password', '两次输入的密码不一致')])
     vercode = StringField(validators=[InputRequired('答案写错了')])
 
 
@@ -36,9 +36,25 @@ class ChangePassWordForm(FlaskForm):
         validators=[DataRequired(code_msg.NOW_PASSWORD_EMPTY.get_msg())]
     )
     password = PasswordField(
-        validators=[Length(min=6, max=6, message=code_msg.PASSWORD_LENGTH_ERROR.get_msg())]
+        validators=[Length(min=6, max=16, message=code_msg.PASSWORD_LENGTH_ERROR.get_msg())]
     )
     repassword = PasswordField(
         validators=[EqualTo('password', code_msg.PASSWORD_REPEAT_ERROR.get_msg())]
     )
 
+
+class SendForgetMailForm(FlaskForm):
+    email = fields.StringField(validators=[DataRequired(code_msg.EMAIL_EMPTY.get_msg())])
+    vercode = fields.StringField(validators=[InputRequired(code_msg.VERIFY_CODE_ERROR.get_msg())])
+
+
+class ForgetPasswordForm(FlaskForm):
+    email = fields.StringField(validators=[DataRequired(code_msg.EMAIL_EMPTY.get_msg())])
+    code = fields.StringField(validators=[DataRequired(
+        code_msg.VERIFY_CODE_ERROR.get_msg())])
+    vercode = fields.StringField(validators=[InputRequired(
+        code_msg.VERIFY_CODE_ERROR.get_msg())])
+    password = fields.PasswordField(validators=[Length(min=6, max=16,
+                                                      message=code_msg.PASSWORD_LENGTH_ERROR.get_msg())])
+    repassword = fields.PasswordField(validators=[EqualTo('password',
+                                                          code_msg.PASSWORD_REPEAT_ERROR.get_msg())])

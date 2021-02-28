@@ -1,509 +1,519 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Layui</title>
-  <meta name="renderer" content="webkit">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <link rel="stylesheet" href="/static/layui/css/layui.css"  media="all">
+    <meta charset="utf-8">
+    <title>Self Serve DA</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./static/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <style type="text/css">
+        .layui-form-label { width: 150px; }
+        .ui-autocomplete {
+            max-height: 300px;
+            overflow-y: auto;   /* prevent horizontal scrollbar */
+            overflow-x: hidden; /* add padding to account for vertical scrollbar */
+            z-index:1000 !important;
+        }
+    </style>
 </head>
 <body>
-
-<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-  <legend>表单集合演示</legend>
-</fieldset>
-
-<form class="layui-form" action="">
-  <div class="layui-form-item">
-    <label class="layui-form-label">单行输入框</label>
-    <div class="layui-input-block">
-      <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">验证必填项</label>
-    <div class="layui-input-block">
-      <input type="text" name="username" lay-verify="required" lay-reqtext="用户名是必填项，岂能为空？" placeholder="请输入" autocomplete="off" class="layui-input">
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">验证手机</label>
-      <div class="layui-input-inline">
-        <input type="tel" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-    <div class="layui-inline">
-      <label class="layui-form-label">验证邮箱</label>
-      <div class="layui-input-inline">
-        <input type="text" name="email" lay-verify="email" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">多规则验证</label>
-      <div class="layui-input-inline">
-        <input type="text" name="number" lay-verify="required|number" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-    <div class="layui-inline">
-      <label class="layui-form-label">验证日期</label>
-      <div class="layui-input-inline">
-        <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-    <div class="layui-inline">
-      <label class="layui-form-label">验证链接</label>
-      <div class="layui-input-inline">
-        <input type="tel" name="url" lay-verify="url" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <label class="layui-form-label">验证身份证</label>
-    <div class="layui-input-block">
-      <input type="text" name="identity" lay-verify="identity" placeholder="" autocomplete="off" class="layui-input">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">自定义验证</label>
-    <div class="layui-input-inline">
-      <input type="password" name="password" lay-verify="pass" placeholder="请输入密码" autocomplete="off" class="layui-input">
-    </div>
-    <div class="layui-form-mid layui-word-aux">请填写6到12位密码</div>
-  </div>
-
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">范围</label>
-      <div class="layui-input-inline" style="width: 100px;">
-        <input type="text" name="price_min" placeholder="￥" autocomplete="off" class="layui-input">
-      </div>
-      <div class="layui-form-mid">-</div>
-      <div class="layui-input-inline" style="width: 100px;">
-        <input type="text" name="price_max" placeholder="￥" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <label class="layui-form-label">单行选择框</label>
-    <div class="layui-input-block">
-      <select name="interest" lay-filter="aihao">
-        <option value=""></option>
-        <option value="0">写作</option>
-        <option value="1" selected="">阅读</option>
-        <option value="2">游戏</option>
-        <option value="3">音乐</option>
-        <option value="4">旅行</option>
-      </select>
-    </div>
-  </div>
-
-
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">分组选择框</label>
-      <div class="layui-input-inline">
-        <select name="quiz">
-          <option value="">请选择问题</option>
-          <optgroup label="城市记忆">
-            <option value="你工作的第一个城市">你工作的第一个城市</option>
-          </optgroup>
-          <optgroup label="学生时代">
-            <option value="你的工号">你的工号</option>
-            <option value="你最喜欢的老师">你最喜欢的老师</option>
-          </optgroup>
-        </select>
-      </div>
-    </div>
-    <div class="layui-inline">
-      <label class="layui-form-label">搜索选择框</label>
-      <div class="layui-input-inline">
-        <select name="modules" lay-verify="required" lay-search="">
-          <option value="">直接选择或搜索选择</option>
-          <option value="1">layer</option>
-          <option value="2">form</option>
-          <option value="3">layim</option>
-          <option value="4">element</option>
-          <option value="5">laytpl</option>
-          <option value="6">upload</option>
-          <option value="7">laydate</option>
-          <option value="8">laypage</option>
-          <option value="9">flow</option>
-          <option value="10">util</option>
-          <option value="11">code</option>
-          <option value="12">tree</option>
-          <option value="13">layedit</option>
-          <option value="14">nav</option>
-          <option value="15">tab</option>
-          <option value="16">table</option>
-          <option value="17">select</option>
-          <option value="18">checkbox</option>
-          <option value="19">switch</option>
-          <option value="20">radio</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <label class="layui-form-label">联动选择框</label>
-    <div class="layui-input-inline">
-      <select name="quiz1">
-        <option value="">请选择省</option>
-        <option value="浙江" selected="">浙江省</option>
-        <option value="你的工号">江西省</option>
-        <option value="你最喜欢的老师">福建省</option>
-      </select>
-    </div>
-    <div class="layui-input-inline">
-      <select name="quiz2">
-        <option value="">请选择市</option>
-        <option value="杭州">杭州</option>
-        <option value="宁波" disabled="">宁波</option>
-        <option value="温州">温州</option>
-        <option value="温州">台州</option>
-        <option value="温州">绍兴</option>
-      </select>
-    </div>
-    <div class="layui-input-inline">
-      <select name="quiz3">
-        <option value="">请选择县/区</option>
-        <option value="西湖区">西湖区</option>
-        <option value="余杭区">余杭区</option>
-        <option value="拱墅区">临安市</option>
-      </select>
-    </div>
-    <div class="layui-form-mid layui-word-aux">此处只是演示联动排版，并未做联动交互</div>
-  </div>
-
-  <div class="layui-form-item">
-    <label class="layui-form-label">复选框</label>
-    <div class="layui-input-block">
-      <input type="checkbox" name="like[write]" title="写作">
-      <input type="checkbox" name="like[read]" title="阅读" checked="">
-      <input type="checkbox" name="like[game]" title="游戏">
-    </div>
-  </div>
-
-  <div class="layui-form-item" pane="">
-    <label class="layui-form-label">原始复选框</label>
-    <div class="layui-input-block">
-      <input type="checkbox" name="like1[write]" lay-skin="primary" title="写作" checked="">
-      <input type="checkbox" name="like1[read]" lay-skin="primary" title="阅读">
-      <input type="checkbox" name="like1[game]" lay-skin="primary" title="游戏" disabled="">
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <label class="layui-form-label">开关-默认关</label>
-    <div class="layui-input-block">
-      <input type="checkbox" name="close" lay-skin="switch" lay-text="ON|OFF">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">开关-默认开</label>
-    <div class="layui-input-block">
-      <input type="checkbox" checked="" name="open" lay-skin="switch" lay-filter="switchTest" lay-text="ON|OFF">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">单选框</label>
-    <div class="layui-input-block">
-      <input type="radio" name="sex" value="男" title="男" checked="">
-      <input type="radio" name="sex" value="女" title="女">
-      <input type="radio" name="sex" value="禁" title="禁用" disabled="">
-    </div>
-  </div>
-  <div class="layui-form-item layui-form-text">
-    <label class="layui-form-label">普通文本域</label>
-    <div class="layui-input-block">
-      <textarea placeholder="请输入内容" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <!--<div class="layui-form-item layui-form-text">
-    <label class="layui-form-label">编辑器</label>
-    <div class="layui-input-block">
-      <textarea class="layui-textarea layui-hide" name="content" lay-verify="content" id="LAY_demo_editor"></textarea>
-    </div>
-  </div>-->
-  <div class="layui-form-item">
-    <div class="layui-input-block">
-      <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
-      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-    </div>
-  </div>
-</form>
-
-<!-- 示例-970 -->
-<ins class="adsbygoogle" style="display:inline-block;width:970px;height:90px" data-ad-client="ca-pub-6111334333458862" data-ad-slot="3820120620"></ins>
-
 <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
-  <legend>赋值和取值</legend>
+    <legend>Input</legend>
 </fieldset>
 
 <form class="layui-form" action="" lay-filter="example">
-  <div class="layui-form-item">
-    <label class="layui-form-label">输入框</label>
-    <div class="layui-input-block">
-      <input type="text" name="username" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Source Code</label>
+            <div class="layui-input-inline">
+                <input id="source_code" type="text" name="source_code" lay-verify="not_empty" autocomplete="off" placeholder="source code" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Kickoff Condition</label>
+            <div class="layui-input-inline">
+                <input type="text" name="kickoff_condition" autocomplete="off" placeholder="kickof condition" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Business Unit</label>
+            <div class="layui-input-inline">
+                <input type="text" name="business_unit" autocomplete="off" placeholder="business unit" class="layui-input">
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">密码框</label>
-    <div class="layui-input-block">
-      <input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Scheduled Pickup Date</label>
+            <div class="layui-input-inline">
+                <input id="scheduled_pickup_date" type="text" name="scheduled_pickup_date" autocomplete="off" value="15:30" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">File Date Offset</label>
+            <div class="layui-input-inline">
+                <input type="text" name="file_date_offset" autocomplete="off" placeholder="File Date Offset" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">File Frequency</label>
+            <div class="layui-input-inline">
+                <select name="file_frequency">
+                    <option value="Daily" selected>Daily</option>
+                    <option value="Hourly">Hourly</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Yearly">Yearly</option>
+                </select>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="layui-form-item">
-    <label class="layui-form-label">选择框</label>
-    <div class="layui-input-block">
-      <select name="interest" lay-filter="aihao">
-        <option value=""></option>
-        <option value="0">写作</option>
-        <option value="1">阅读</option>
-        <option value="2">游戏</option>
-        <option value="3">音乐</option>
-        <option value="4">旅行</option>
-      </select>
-    </div>
-  </div>
 
-  <div class="layui-form-item">
-    <label class="layui-form-label">复选框</label>
-    <div class="layui-input-block">
-      <input type="checkbox" name="like[write]" title="写作">
-      <input type="checkbox" name="like[read]" title="阅读">
-      <input type="checkbox" name="like[daze]" title="发呆">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">File Type Code</label>
+            <div class="layui-input-inline">
+                <input type="text" name="file_type_code" autocomplete="off" placeholder="File Type Code" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Supplier Email Address</label>
+            <div class="layui-input-inline">
+                <input type="text" name="supplier_email_address" autocomplete="off" placeholder="Supplier Email Address" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Source Provider Code</label>
+            <div class="layui-input-inline">
+                <input type="text" name="source_provider_code" autocomplete="off" placeholder="Source Provider Code" class="layui-input">
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Dev Team Code</label>
+            <div class="layui-input-inline">
+                <input type="text" name="dev_team_code" autocomplete="off" value="ETL" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">BIZ Contact Email</label>
+            <div class="layui-input-inline">
+                <input type="text" name="biz_contact_email" autocomplete="off" placeholder="BIZ Contact Email" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Supplier Name</label>
+            <div class="layui-input-inline">
+                <input type="text" name="supplier_name" autocomplete="off" value="ETL Dev Team <ETLDevTeam@pimco.com>" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Supplier Email</label>
+            <div class="layui-input-inline">
+                <input type="text" name="supplier_email" autocomplete="off" value="ETL Dev Team <ETLDevTeam@pimco.com>" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Supplier Phone</label>
+            <div class="layui-input-inline">
+                <input type="text" name="supplier_phone" autocomplete="off" placeholder="Supplier Phone" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Is Paid Feed?</label>
+            <div class="layui-input-inline">
+                <select name="is_paid_feed">
+                    <option value="">null</option>
+                    <option value="1" selected>1</option>
+                    <option value="0">0</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
-  <div class="layui-form-item">
-    <label class="layui-form-label">开关</label>
-    <div class="layui-input-block">
-      <input type="checkbox" name="close" lay-skin="switch" lay-text="ON|OFF">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label id='source_provider_name_label' class="layui-form-label">Source Provider Name</label>
+            <div class="layui-input-inline">
+                <input id='source_provider_name' type="text" name="source_provider_name" autocomplete="off" placeholder="Source Provider Name" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Onsite Tech Lead</label>
+            <div class="layui-input-inline">
+                <input type="text" name="onsite_Tech_lead" autocomplete="off" placeholder="Onsite Tech Lead" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Local Folder</label>
+            <div class="layui-input-inline">
+                <input type="text" name="local_folder" autocomplete="off" placeholder="Local Folder" class="layui-input">
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Holiday Exclusion</label>
+            <div class="layui-input-inline">
+                <select name="holiday_exclusion">
+                    <option value="Yes">Yes</option>
+                    <option value="No" selected>No</option>
+                    <option value="null" selected>null</option>
+                    <option value="" selected></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Weekend Excluded</label>
+            <div class="layui-input-inline">
+                <select name="weekend_excluded">
+                    <option value="Yes">Yes</option>
+                    <option value="No" selected>No</option>
+                    <option value="null">null</option>
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">JIRA Number</label>
+            <div class="layui-input-inline">
+                <input type="text" name="jira_number" autocomplete="off" placeholder="JIRA Number" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">File Names</label>
+            <div class="layui-input-inline">
+                <input type="text" name="file_names" autocomplete="off" placeholder="file_names" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Job Criticality Code</label>
+            <div class="layui-input-inline">
+                <select name="job_criticality_code">
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM" selected>MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">Environment</label>
+            <div class="layui-input-inline">
+                <select name="environment">
+                    <option value="dev" selected>DEV</option>
+                    <option value="beta">BETA</option>
+                    <option value="prod">PROD</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Feed Type</label>
+            <div class="layui-input-inline">
+                <select  id="feed-type-select" name="feed_type" lay-filter="feed-type">
+                    <option value="FTP">FTP</option>
+                    <option value="HTTP" selected>HTTP</option>
+                    <option value="EMail">EMail</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="ftp-related layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">FTP Server Name</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ftp_server_name"  autocomplete="off" placeholder="FTP Server Name" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">FTP UserName</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ftp_user_name" autocomplete="off" placeholder="FTP UserName" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">FTP Password</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ftp_password" autocomplete="off" placeholder="FTP Password" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="ftp-related layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">FTP file folder</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ftp_file_folder" autocomplete="off" placeholder="FTP file folder" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">FTP Filename</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ftp_file_name" autocomplete="off" placeholder="FTP Filename" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">FTP Protocol Code</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ftp_protocol_code" autocomplete="off" placeholder="FTP Protocol Code" value="SFTP" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="ftp-related layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Port No</label>
+            <div class="layui-input-inline">
+                <input type="text" name="port_no" lay-verify="port_no" autocomplete="off" value="22" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button id='main_edit' type="button" class="input-btn layui-btn layui-btn-primary">Fetch</button>
+            <button id='main_submit' type="button" class="input-btn layui-btn" lay-submit="" lay-filter="demo1">Submit</button>
+        </div>
+    </div>
 
-  <div class="layui-form-item">
-    <label class="layui-form-label">单选框</label>
-    <div class="layui-input-block">
-      <input type="radio" name="sex" value="男" title="男" checked="">
-      <input type="radio" name="sex" value="女" title="女">
-    </div>
-  </div>
-  <div class="layui-form-item layui-form-text">
-    <label class="layui-form-label">文本域</label>
-    <div class="layui-input-block">
-      <textarea placeholder="请输入内容" class="layui-textarea" name="desc"></textarea>
-    </div>
-  </div>
-
-  <div class="layui-form-item">
-    <div class="layui-input-block">
-      <button type="button" class="layui-btn layui-btn-normal" id="LAY-component-form-setval">赋值</button>
-      <button type="button" class="layui-btn layui-btn-normal" id="LAY-component-form-getval">取值</button>
-      <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
-    </div>
-  </div>
 </form>
-<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
-  <legend>方框风格的表单集合</legend>
+
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>Utilities</legend>
 </fieldset>
-<form class="layui-form layui-form-pane" action="">
-  <div class="layui-form-item">
-    <label class="layui-form-label">长输入框</label>
-    <div class="layui-input-block">
-      <input type="text" name="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">短输入框</label>
-    <div class="layui-input-inline">
-      <input type="text" name="username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
-    </div>
-  </div>
 
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">日期选择</label>
-      <div class="layui-input-block">
-        <input type="text" name="date" id="date1" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-    <div class="layui-inline">
-      <label class="layui-form-label">行内表单</label>
-      <div class="layui-input-inline">
-        <input type="text" name="number" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <label class="layui-form-label">密码</label>
-    <div class="layui-input-inline">
-      <input type="password" name="password" placeholder="请输入密码" autocomplete="off" class="layui-input">
-    </div>
-    <div class="layui-form-mid layui-word-aux">请务必填写用户名</div>
-  </div>
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <div class="layui-row layui-col-space15">
 
-  <div class="layui-form-item">
-    <div class="layui-inline">
-      <label class="layui-form-label">范围</label>
-      <div class="layui-input-inline" style="width: 100px;">
-        <input type="text" name="price_min" placeholder="￥" autocomplete="off" class="layui-input">
-      </div>
-      <div class="layui-form-mid">-</div>
-      <div class="layui-input-inline" style="width: 100px;">
-        <input type="text" name="price_max" placeholder="￥" autocomplete="off" class="layui-input">
-      </div>
-    </div>
-  </div>
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">Upload</div>
+                <div class="layui-row layui-card-body">
+                    <div class="layui-col-md5">
+                        <div class="layui-card">
+                            <div class="layui-upload-drag" id="upload">
+                                <i class="layui-icon"></i>
+                                <p>Click or Drag the file here to Upload</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-md7">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
+                                <div id="uploadDemoView">
+                                    <p id="upload-message"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <div class="layui-form-item">
-    <label class="layui-form-label">单行选择框</label>
-    <div class="layui-input-block">
-      <select name="interest" lay-filter="aihao">
-        <option value=""></option>
-        <option value="0">写作</option>
-        <option value="1" selected="">阅读</option>
-        <option value="2">游戏</option>
-        <option value="3">音乐</option>
-        <option value="4">旅行</option>
-      </select>
-    </div>
-  </div>
 
-  <div class="layui-form-item">
-    <label class="layui-form-label">行内选择框</label>
-    <div class="layui-input-inline">
-      <select name="quiz1">
-        <option value="">请选择省</option>
-        <option value="浙江" selected="">浙江省</option>
-        <option value="你的工号">江西省</option>
-        <option value="你最喜欢的老师">福建省</option>
-      </select>
-    </div>
-    <div class="layui-input-inline">
-      <select name="quiz2">
-        <option value="">请选择市</option>
-        <option value="杭州">杭州</option>
-        <option value="宁波" disabled="">宁波</option>
-        <option value="温州">温州</option>
-        <option value="温州">台州</option>
-        <option value="温州">绍兴</option>
-      </select>
-    </div>
-    <div class="layui-input-inline">
-      <select name="quiz3">
-        <option value="">请选择县/区</option>
-        <option value="西湖区">西湖区</option>
-        <option value="余杭区">余杭区</option>
-        <option value="拱墅区">临安市</option>
-      </select>
-    </div>
-  </div>
-  <div class="layui-form-item" pane="">
-    <label class="layui-form-label">开关-开</label>
-    <div class="layui-input-block">
-      <input type="checkbox" checked="" name="open" lay-skin="switch" lay-filter="switchTest" title="开关">
-    </div>
-  </div>
-  <div class="layui-form-item" pane="">
-    <label class="layui-form-label">单选框</label>
-    <div class="layui-input-block">
-      <input type="radio" name="sex" value="男" title="男" checked="">
-      <input type="radio" name="sex" value="女" title="女">
-      <input type="radio" name="sex" value="禁" title="禁用" disabled="">
-    </div>
-  </div>
-  <div class="layui-form-item layui-form-text">
-    <label class="layui-form-label">文本域</label>
-    <div class="layui-input-block">
-      <textarea placeholder="请输入内容" class="layui-textarea"></textarea>
-    </div>
-  </div>
-  <div class="layui-form-item">
-    <button class="layui-btn" lay-submit="" lay-filter="demo2">跳转式提交</button>
-  </div>
-</form>
 
-<script src="/static/layui/layui.js"></script>
-<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">Check Request ID</div>
+                <div class="layui-card-body">
+                    <div class="layui-row layui-card-body">
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <form class="layui-form" action="" lay-filter="check">
+                                    <div class="layui-form-item">
+                                        <input id='check-request-id' type="text" name="request_id" lay-verify="not_empty" autocomplete="off" placeholder="request id" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <button id='check-button' type="button" class="layui-btn layui-btn-primary" lay-submit="" lay-filter="check-button">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="layui-col-md5" style="margin-left: 10px">
+                            <div class="layui-card-header">Current Status: <span id="request-status" style="color:green">NULL</span></div>
+                            <div class="layui-card">
+                                <p id="check-notice"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">Results</div>
+                <div class="layui-card-body">
+                    <div id="results" class="layui-collapse" lay-filter="download-results">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="./static/layui/layui.js"></script>
 <script>
-layui.use(['form', 'layedit', 'laydate'], function(){
+$(document).ready(function(){
+
+layui.use(['form', 'layedit', 'laydate', 'upload'], function(){
   var form = layui.form
-  ,layer = layui.layer
-  ,layedit = layui.layedit
-  ,laydate = layui.laydate;
+  ,layer = layui.layer, laydate = layui.laydate, upload = layui.upload;
+  var global_file_loop_id = 'empty';
+  var disable_button = function (selector){
+      console.log('>>> disable_button ' + selector);
+      $(selector).prop('disabled', true);
+      $(selector).attr('disabled', true);
+  };
+  var enable_button = function (selector){
+      console.log('>>> enable_button ' + selector);
+      $(selector).prop('disabled', false);
+      $(selector).attr('disabled', false);
+  };
+  var say = function(message) {
+      return layer.open({
+          title: 'Message',
+          content: message,
+          btn: 'OK'
+      });
+  };
 
-  //日期
-  laydate.render({
-    elem: '#date'
-  });
-  laydate.render({
-    elem: '#date1'
-  });
+    let check_file_id = function(file_id, loop_id) {
+      console.log('check file-id');
+      $('#check-file-notice').text('checking...');
+      let url = './csv_check/' + file_id;
+      try {
+          layui.$.ajax({
+              url:url,
+              type:'get',
+              success:function(resp_data){
+                  console.log(resp_data);
+                  $('#request-status').text(resp_data.status);
+                  if (resp_data.status == 'success' || resp_data.status == 'failure') {
+                      clearInterval(loop_id);
+                      $('#check-csv-notice').text('task finished');
+                  }
+                  if (resp_data.status == 'NULL'){
+                      $('#check-csv-notice').text('no such file_id :)');
+                  }
+                  if (resp_data.status == 'failed to check'){
+                      $('#check-csv-notice').text('failed to check: '+ resp_data.payload);
+                  }
+              },
+              error: function(a, b, c){
+                  $('#check-csv-notice').val('failed to get status');
+              },
+              complete: function () {
+                  enable_button('#check-button');
+                  console.log('ajax done');
+              }
+          });
+      } catch(err) {
+          console.log(err);
+      } finally {
+          return false;
+      }
+  };
 
-  //创建一个编辑器
-  var editIndex = layedit.build('LAY_demo_editor');
-
-  //自定义验证规则
   form.verify({
-    title: function(value){
-      if(value.length < 5){
-        return '标题至少得5个字符啊';
+    not_empty: function(value){
+      if(value.length < 1){
+        return 'cannot be empty';
       }
     }
-    ,pass: [
-      /^[\S]{6,12}$/
-      ,'密码必须6到12位，且不能出现空格'
-    ]
-    ,content: function(value){
-      layedit.sync(editIndex);
+  });
+
+  let trigger_csv_check = function(file_id){
+      if (global_loop_id != 'empty'){
+          clearInterval(global_loop_id);
+          global_loop_id = 'empty';
+      }
+      let times = 3599;
+      let loop_check = function(){
+          console.log(times);
+          if (times == 0) {
+              $('#check-csv-notice').text('Timeout, please submit or upload again.');
+              clearInterval(loop_id);
+              return;
+          }
+          remains = times % 8;
+          if (remains == 0) {
+              check_file_id(request_id, loop_id);
+              let status = $('#request-status').text();
+              console.log(status);
+              if (status == 'success' || status == 'failure'){
+                  console.log(loop_id);
+                  clearInterval(loop_id);
+              }
+          } else {
+              if (remains == 1){
+                  $('#check-notice').text('will update after 1 second');
+              } else {
+                  $('#check-notice').text('will update after ' + remains + ' seconds');
+              }
+          }
+          times -= 1;
+      }
+      let loop_id = setInterval(loop_check, 1000);
+      global_loop_id = loop_id;
+  };
+
+  form.on('submit(demo-csv-file)', function(data){
+    console.log('in submit');
+    let url = '{{ '.'+url_for('csv_upload') }}';
+    disable_button('.input-btn');
+    let load_index = say('Data Submitted, Starting the task.');
+    try {
+        layui.$.ajax({
+            url:url,
+            type:'post',
+            data: data.field,
+            timeout: 20000,
+            success:function(resp_data){
+               layer.close(load_index);
+               if(resp_data.success){
+                   $('html,body').animate({ scrollTop: 9999 }, 'slow');
+                   $('#check-request-id').val(resp_data.request_id);
+                   say(resp_data.request_id + ' started');
+                   trigger_check(resp_data.request_id);
+                   $('#request-status').text('started');
+               } else {
+                   say(resp_data.data)
+               }
+            },
+            complete: function () {
+                layer.close(load_index);
+                console.log('ajax done');
+            }
+        });
+    } catch(err) {
+        enable_button('.input-btn');
+        console.log(err);
+    } finally {
+        enable_button('.input-btn');
+        return false;
     }
   });
 
-  //监听指定开关
-  form.on('switch(switchTest)', function(data){
-    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
-      offset: '6px'
-    });
-    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+  form.on('submit(check-file-button)', function(data){
+    console.log('check file-id');
+    check_file_id(data.field.file_id);
   });
 
-  //监听提交
-  form.on('submit(demo1)', function(data){
-    layer.alert(JSON.stringify(data.field), {
-      title: '最终的提交信息'
-    })
-    return false;
-  });
-
-  //表单赋值
-  layui.$('#LAY-component-form-setval').on('click', function(){
-    form.val('example', {
-      "username": "贤心" // "name": "value"
-      ,"password": "123456"
-      ,"interest": 1
-      ,"like[write]": true //复选框选中状态
-      ,"close": true //开关状态
-      ,"sex": "女"
-      ,"desc": "我爱 layui"
-    });
-  });
-
-  //表单取值
-  layui.$('#LAY-component-form-getval').on('click', function(){
-    var data = form.val('example');
-    alert(JSON.stringify(data));
-  });
+});
 
 });
 </script>

@@ -1,12 +1,16 @@
 from flask import (
-    Blueprint, flash, render_template, current_app, jsonify, url_for, request, abort
+    Blueprint, flash, render_template, current_app, jsonify, url_for, request, abort,
+    redirect
 )
 from flask_login import login_required, current_user
 from bson import ObjectId
 from datetime import datetime
 from ..extensions import mongo
 from .. import code_msg, models
-
+from flask_uploads import UploadNotAllowed
+from fly_bbs.extensions import upload_photos
+from fly_bbs import db_utils
+import random
 
 api_view = Blueprint('api', __name__, url_prefix='/api')
 
@@ -194,20 +198,62 @@ def get_reply_content(comment_id):
     return jsonify(models.R.ok(data=comment['content']))
 
 
+@api_view.route('/upload/<string:name>')
+@api_view.route('/upload', methods=['POST'])
+def upload(name=None):
+    if request.method == 'POST':
+        if not current_user.is_authenticated:
+            return jsonify(code_msg.USER_UN_LOGIN)
+        file = request.files['smfile']
+        if not file:
+            return jsonify(code_msg.FILE_EMPTY)
+        try:
+            filename = upload_photos.save(file)
+            print(">>> filename: [%s]" % filename)
+        except UploadNotAllowed:
+            return jsonify(code_msg.UPLOAD_UN_ALLOWED)
+        file_url = '/api/upload/' + filename
+        result = models.R(data={'url': file_url}).put('code', 0)
+        return jsonify(result)
+    if not name:
+        abort(404)
+    url = upload_photos.url(name)
+    print(">>> url: [%s]" % url)
+    return redirect(url)
 
 
+@api_view.route('/sign', methods=['POST'])
+@login_required
+def user_sign():
+    date = datetime.utcnow().strftime('%Y-%m-%d')
+    user = current_user.user
+    doc = {
+        'user_id': user['_id'],
+        'date': date
+    }
+    sign_log = mongo.db['user_signs'].find_one(doc)
+    if sign_log:
+        return jsonify(code_msg.REPEAT_SIGNED)
+    interval = db_utils.get_option(
+        'sign_interval', {'val': '1-100'}
+    )['val'].split('-')
+    coin = random.randint(int(interval[0]), int(interval[1]))
+    doc['coin'] = coin
+    mongo.db['user_signs'].insert_one(doc)
+    mongo.db.users.update({'_id': user['_id']}, {'$inc': {'coin': coin}})
+    return jsonify(models.R.ok(data={'signed': True, 'coin': coin}))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+@api_view.route('/sign/status', methods=['POST'])
+@login_required
+def sign_status():
+    user = current_user.user
+    sign_log = mongo.db['user_signs'].find_one(
+        {'user_id': user['_id'], 'date': datetime.utcnow().strftime('%Y-%m-%d')}
+    )
+    signed = False
+    coin = 0
+    if sign_log:
+        signed = True
+        coin = sign_log.get('coin', 0)
+    return jsonify(models.R.ok(data={'signed': signed, 'coin': coin}))

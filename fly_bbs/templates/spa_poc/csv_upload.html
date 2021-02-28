@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Self Serve DA</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./static/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <style type="text/css">
+        .layui-form-label { width: 150px; }
+        .ui-autocomplete {
+            max-height: 300px;
+            overflow-y: auto;   /* prevent horizontal scrollbar */
+            overflow-x: hidden; /* add padding to account for vertical scrollbar */
+            z-index:1000 !important;
+        }
+    </style>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+    <legend>CSV Upload</legend>
+</fieldset>
+
+<div style="padding: 20px; background-color: #F2F2F2;">
+    <div class="layui-row layui-col-space15">
+
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">Upload</div>
+                <div class="layui-row layui-card-body">
+                    <div class="layui-col-md5">
+                        <div class="layui-card">
+            <form class="layui-form" action="" enctype="multipart/form-data">
+                <div class="layui-form-item">
+                    <div class="layui-input-item">
+                        <input id="source_code"  type="text" name="source_code" maxlength="300" required  lay-verify="required" placeholder="Source Code" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-inline uploadHeadImage">
+                        <div class="layui-upload-drag" id="csv-file-upload">
+                            <i class="layui-icon"></i>
+                            <p>Click and Choose or Drag a file here.</p>
+                        </div>
+                    </div>
+                    <div class="layui-input-inline">
+                        <div id="uploadResult" class="layui-upload-list">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                     <div class="layui-form-item">
+                         <button id='csv-upload-button' type="button" class="layui-btn layui-btn-primary" lay-submit="" lay-filter="csv-upload-button">
+                              Submit
+                         </button>
+                     </div>
+                </div>
+            </form>
+                        </div>
+                    </div>
+                    <div class="layui-col-md7">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
+                                <div id="uploadDemoView">
+                                    <p id="upload-message"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">Check File ID</div>
+                <div class="layui-card-body">
+                    <div class="layui-row layui-card-body">
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <form class="layui-form" action="" lay-filter="check">
+                                    <div class="layui-form-item">
+                                        <input id='check-file-id' type="text" name="file_id" lay-verify="not_empty" autocomplete="off" placeholder="file id" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <button id='check-csv-button' type="button" class="layui-btn layui-btn-primary" lay-submit="" lay-filter="check-button">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="layui-col-md5" style="margin-left: 10px">
+                            <div class="layui-card-header">Current Status: <span id="request-status" style="color:green">NULL</span></div>
+                            <div class="layui-card">
+                                <p id="check-csv-notice"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="./static/layui/layui.js"></script>
+<script>
+$(document).ready(function(){
+
+layui.use(['form', 'layedit', 'laydate', 'upload'], function(){
+  var form = layui.form
+  ,layer = layui.layer, laydate = layui.laydate, upload = layui.upload;
+  var global_file_loop_id = 'empty';
+  var disable_button = function (selector){
+      console.log('>>> disable_button ' + selector);
+      $(selector).prop('disabled', true);
+      $(selector).attr('disabled', true);
+  };
+  var enable_button = function (selector){
+      console.log('>>> enable_button ' + selector);
+      $(selector).prop('disabled', false);
+      $(selector).attr('disabled', false);
+  };
+  var say = function(message) {
+      return layer.open({
+          title: 'Message',
+          content: message,
+          btn: 'OK'
+      });
+  };
+
+    let check_file_id = function(file_id, loop_id) {
+      console.log('check file-id');
+      $('#check-file-notice').text('checking...');
+      let url = './csv_check/' + file_id;
+      try {
+          layui.$.ajax({
+              url:url,
+              type:'get',
+              success:function(resp_data){
+                  console.log(resp_data);
+                  $('#request-status').text(resp_data.status);
+                  if (resp_data.status == 'success' || resp_data.status == 'failure') {
+                      clearInterval(loop_id);
+                      $('#check-csv-notice').text('task finished');
+                  }
+                  if (resp_data.status == 'NULL'){
+                      $('#check-csv-notice').text('no such file_id :)');
+                  }
+                  if (resp_data.status == 'failed to check'){
+                      $('#check-csv-notice').text('failed to check: '+ resp_data.payload);
+                  }
+              },
+              error: function(a, b, c){
+                  $('#check-csv-notice').val('failed to get status');
+              },
+              complete: function () {
+                  enable_button('#check-button');
+                  console.log('ajax done');
+              }
+          });
+      } catch(err) {
+          console.log(err);
+      } finally {
+          return false;
+      }
+  };
+
+  form.verify({
+    not_empty: function(value){
+      if(value.length < 1){
+        return 'cannot be empty';
+      }
+    }
+  });
+
+  let trigger_csv_check = function(file_id){
+      if (global_loop_id != 'empty'){
+          clearInterval(global_loop_id);
+          global_loop_id = 'empty';
+      }
+      let times = 3599;
+      let loop_check = function(){
+          console.log(times);
+          if (times == 0) {
+              $('#check-csv-notice').text('Timeout, please submit or upload again.');
+              clearInterval(loop_id);
+              return;
+          }
+          remains = times % 8;
+          if (remains == 0) {
+              check_file_id(request_id, loop_id);
+              let status = $('#request-status').text();
+              console.log(status);
+              if (status == 'success' || status == 'failure'){
+                  console.log(loop_id);
+                  clearInterval(loop_id);
+              }
+          } else {
+              if (remains == 1){
+                  $('#check-notice').text('will update after 1 second');
+              } else {
+                  $('#check-notice').text('will update after ' + remains + ' seconds');
+              }
+          }
+          times -= 1;
+      }
+      let loop_id = setInterval(loop_check, 1000);
+      global_loop_id = loop_id;
+  };
+
+            var uploadInst = upload.render({
+                elem: '#csv-file-upload', //绑定元素
+                url: './csv_upload', //上传接口
+                method: 'POST',
+                auto: false,
+                accept: 'file',
+                bindAction: '#csv-upload-button',
+                multiple: false,
+                data:{},
+                before: function(obj) {
+                    say('start uploading');
+                    this.data.source_code = $('#source_code').val();
+                    return false;
+                },
+                done: function(data, index, upload) {
+                    if (data.no === 1) {
+                        layer.msg("Upload Successfully!", {
+                            icon: 6
+                        });
+                    } else {
+                        layer.msg("Failed to Upload!", {
+                            icon: 5
+                        });
+                    }
+                }
+                , error: function() {
+                    layer.msg('Network Glitch, please retry later！');
+                }
+            });
+
+});
+
+});
+</script>
+
+</body>
+</html>
