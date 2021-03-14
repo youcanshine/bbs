@@ -5,10 +5,12 @@ from datetime import datetime
 from pymongo import DESCENDING
 from .. import code_msg
 from ..forms import PostForm
-from ..models import R, BaseResult
+from ..models import R, BaseResult, Page
 from ..utils import gen_verify_num, verify_num
-from ..extensions import mongo
+from ..extensions import mongo, whoosh_searcher
 from ..db_utils import get_page, find_one
+from whoosh import qparser, sorting
+from whoosh.query import *
 
 
 bbs_index = Blueprint("bbs_index", __name__, template_folder='templates')
@@ -121,4 +123,62 @@ def jump_comment(comment_id):
             pn += 1
     return redirect(
         url_for('bbs_index.post_detail', post_id=post_id, pn=pn) + '#item-' + str(comment_id)
+    )
+
+
+@bbs_index.route('/refresh/indexes')
+def refresh_indexes():
+    name = request.values.get('name')
+    whoosh_searcher.clear(name)
+    writer = whoosh_searcher.get_writer(name)
+    for item in mongo.db[name].find(
+            {},
+            ['_id', 'title', 'content', 'create_at', 'user_id', 'catalog_id']):
+        item['obj_id'] = str(item['_id'])
+        item['user_id'] = str(item['user_id'])
+        item['catalog_id'] = str(item['catalog_id'])
+        item.pop('_id')
+        writer.add_document(**item)
+    writer.commit()
+    return ''
+
+
+@bbs_index.route('/search')
+@bbs_index.route('/search/page/<int:pn>/')
+def post_search(pn=1, size=10):
+    keyword = request.values.get('kw')
+    if keyword is None:
+        return render_template(
+            'search/list.html', title='搜索', message='搜索关键字不能为空！', page=None
+        )
+    whoosh_searcher.clear('posts')
+    writer = whoosh_searcher.get_writer('posts')
+    for item in mongo.db['posts'].find(
+        {},
+        ['_id', 'title', 'content', 'create_at', 'user_id', 'catalog_id']
+    ):
+        item['obj_id'] = str(item['_id'])
+        item['user_id'] = str(item['user_id'])
+        item['catalog_id'] = str(item['catalog_id'])
+        item.pop('_id')
+        writer.add_document(**item)
+    writer.commit()
+    with whoosh_searcher.get_searcher('posts') as searcher:
+        parser = qparser.MultifieldParser(
+            ['title', 'content'],
+            whoosh_searcher.get_index('posts').schema
+        )
+        q = parser.parse(keyword)
+        print('q: ', q)
+        result = searcher.search_page(
+            q, pagenum=pn, pagelen=size, sortedby=sorting.ScoreFacet()
+        )
+        result_list = [x.fields() for x in result.results]
+        # import pdb
+        # pdb.set_trace()
+        page = Page(
+            pn, size, result=result_list, has_more=result.pagecount > pn,
+            page_count=result.pagecount, total=result.total)
+    return render_template(
+        'search/list.html', title=keyword + '搜索结果', page=page, kw=keyword
     )

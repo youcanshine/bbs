@@ -16,7 +16,7 @@ class DevConfig:
     MAIL_USERNAME = 'inseader@qq.com'#os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = 'gvptekdudkllhbgi'#os.environ.get('MAIL_PASSWORD')
     MAIL_SUBJECT_PREFIX = '[PyFLY]-'
-
+    WHOOSH_PATH = os.path.join(os.getcwd(), 'whoosh_indexes')
 
 
 class ProConfig(DevConfig):
